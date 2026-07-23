@@ -1,0 +1,14 @@
+[package]
+name = "functional-composition"
+version = "0.1.0"
+edition = "2021"
+description = "A standalone, lawful functional core: Maybe, Either, pipe/compose, curry, dispatch tables, and trampolines. Zero dependencies."
+license = "MIT"
+authors = ["Sean Dinwiddie"]
+repository = "https://github.com/functional-programming-composition/fp"
+homepage = "https://github.com/functional-programming-composition/fp"
+readme = "README.md"
+keywords = ["functional", "maybe", "either", "monad", "composition"]
+categories = ["rust-patterns", "no-std"]
+
+[dependencies]

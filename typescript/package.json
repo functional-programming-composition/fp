@@ -1,0 +1,63 @@
+{
+  "name": "functional-programming-composition",
+  "version": "0.1.0",
+  "description": "A standalone, lawful functional core: Maybe, Either, match, dispatch tables, curry, and composition. Zero dependencies.",
+  "keywords": [
+    "functional-programming",
+    "maybe",
+    "either",
+    "monad",
+    "functor",
+    "composition",
+    "curry",
+    "pattern-matching"
+  ],
+  "license": "MIT",
+  "author": "Sean Dinwiddie",
+  "homepage": "https://github.com/functional-programming-composition/fp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/functional-programming-composition/fp.git",
+    "directory": "typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/functional-programming-composition/fp/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
