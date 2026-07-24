@@ -46,11 +46,14 @@ the naming adapts to host convention. See [NOTICE.md](NOTICE.md) for provenance.
 
 | Language | Directory | Distribution | Notes |
 | --- | --- | --- | --- |
-| **TypeScript** | [`typescript/`](typescript) | [npm: `functional-programming-composition`](https://www.npmjs.com/package/functional-programming-composition) | Standalone, zero dependencies, ESM + CJS + types |
-| **Rust** | [`rust/`](rust) | [crates.io: `functional-composition`](https://crates.io/crates/functional-composition) | std-only, no dependencies |
-| **GDScript** | [`gdscript/`](gdscript) | copy `fp.gd` into your Godot project | Godot 4 |
-| **Unreal C++** | [`ue-cpp/`](ue-cpp) | copy into an Unreal module | Requires `CoreMinimal.h`; uses `TArray`/`TMap` |
-| **JavaScript** | [`javascript/`](javascript) | copy `fp.js` | Plain ES modules, no build step |
+| **TypeScript** | [`typescript/`](typescript) | ✅ [npm: `functional-programming-composition`](https://www.npmjs.com/package/functional-programming-composition) | Standalone, zero deps, ESM + CJS + types |
+| **Rust** | [`rust/`](rust) | ⏳ crates.io — see [TODO](rust/TODO.md) | `std`-only, 92 fns + `pipe!`/`compose!` macros |
+| **GDScript** | [`gdscript/`](gdscript) | ⏳ Asset Library / gd-plug — see [TODO](gdscript/TODO.md) | Godot 4, 85 static fns, tagged dictionaries |
+| **Unreal C++** | [`ue-cpp/`](ue-cpp) | ⏳ Fab; vcpkg/Conan/CPM after port — see [TODO](ue-cpp/TODO.md) | C++11, 29 headers, `namespace func`. **Needs Unreal** |
+| **JavaScript** | [`javascript/`](javascript) | ⏳ needs ESM port — see [TODO](javascript/TODO.md) | IIFE → `globalThis.functionalCore`; **not** a module |
+
+Each directory has its own README documenting that language's actual API and
+constraints, and a TODO with its publishing path.
 
 ```bash
 # TypeScript

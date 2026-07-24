@@ -1,107 +1,118 @@
-# fp
+# functional-programming-composition
 
-[![skills.sh](https://skills.sh/b/functional-programming-composition/fp)](https://skills.sh/functional-programming-composition/fp)
+[![npm](https://img.shields.io/npm/v/functional-programming-composition)](https://www.npmjs.com/package/functional-programming-composition)
 
-A functional programming **working contract** for coding agents — not an
-introduction. It assumes the decision to use FP is settled and governs *how*.
-
-Language-independent: the same algebra applies in C, Rust, TypeScript, and
-others. Examples are in TypeScript; only the naming adapts to host convention.
-
-## Install
+The **TypeScript** implementation of the [fp core](https://github.com/functional-programming-composition/fp).
+Standalone, **zero runtime dependencies**, ships ESM + CJS + type declarations.
 
 ```bash
-npx skills@latest add functional-programming-composition/fp
-```
-
-Or use it without installing:
-
-```bash
-npx skills@latest use functional-programming-composition/fp | claude
-```
-
-<details>
-<summary>More install options</summary>
-
-```bash
-# Install globally (available across all projects)
-npx skills@latest add functional-programming-composition/fp -g
-
-# Install for a specific agent, non-interactively
-npx skills@latest add functional-programming-composition/fp -a claude-code -g -y
-
-# List what the repo provides without installing
-npx skills@latest add functional-programming-composition/fp --list
-```
-
-Works with Claude Code, OpenCode, Codex, Cursor, and 70+ other agents via the
-[`skills`](https://github.com/vercel-labs/skills) CLI.
-
-</details>
-
-## The cores
-
-The same algebra, implemented in five languages. Semantics are identical; only
-the naming adapts to host convention. See [NOTICE.md](NOTICE.md) for provenance.
-
-| Language | Directory | Distribution | Notes |
-| --- | --- | --- | --- |
-| **TypeScript** | [`typescript/`](typescript) | [npm: `functional-programming-composition`](https://www.npmjs.com/package/functional-programming-composition) | Standalone, zero dependencies, ESM + CJS + types |
-| **Rust** | [`rust/`](rust) | [crates.io: `functional-composition`](https://crates.io/crates/functional-composition) | std-only, no dependencies |
-| **GDScript** | [`gdscript/`](gdscript) | copy `fp.gd` into your Godot project | Godot 4 |
-| **Unreal C++** | [`ue-cpp/`](ue-cpp) | copy into an Unreal module | Requires `CoreMinimal.h`; uses `TArray`/`TMap` |
-| **JavaScript** | [`javascript/`](javascript) | copy `fp.js` | Plain ES modules, no build step |
-
-```bash
-# TypeScript
 npm install functional-programming-composition
-
-# Rust
-cargo add functional-composition
 ```
 
 ```ts
 import { just, fmap, match, right, ematch, compose } from 'functional-programming-composition'
 
-match(fmap(just(21), (n) => n * 2), (v) => `Just(${v})`, () => 'Nothing')  // "Just(42)"
+match(fmap(just(21), (n) => n * 2), (v) => `Just(${v})`, () => 'Nothing') // "Just(42)"
+ematch(right(7), (e) => `Left(${e})`, (v) => `Right(${v})`)               // "Right(7)"
+compose((n: number) => n + 1, (n: number) => n * 2)(5)                    // 11
 ```
 
-## What it covers
+## Carriers are plain tagged data
 
-| Area | Contents |
+`Maybe` and `Either` are discriminated unions carrying a `_tag`, so they stay
+serializable and narrowable. Keep them out of serializable state (a Redux slice
+holds plain data) and lift at the selector or reducer edge with `fromNullable`:
+
+```ts
+import { fromNullable, mbind, match } from 'functional-programming-composition'
+
+const discountFor = (user: User): number =>
+  match(
+    mbind(fromNullable(user.discountCode), lookupDiscount),
+    (rate) => rate,
+    () => 0,
+  )
+```
+
+That single pipeline replaces a nested `if (x != null)` ladder.
+
+## API
+
+### Maybe
+
+| Function | Signature |
 | --- | --- |
-| **Error model** | `Maybe`, `Either`, `Validation` — choosing deliberately, and why collapsing everything into `Nothing` loses information |
-| **The ladder** | Functor → Applicative → Monad → Monoid → Traversable, with a decision tree for picking the *weakest* abstraction that solves the problem |
-| **Applicative vs Monad** | The most-violated distinction: independent checks accumulate (`ap`), dependent steps short-circuit (`chain`) |
-| **Branching** | `match` on shape, dispatch tables on key, predicate combinators on properties — and why a ternary chain is just an `if` that learned to hide |
-| **Loops** | Bounded iteration is a fold; unbounded iteration is a trampoline (`Call`/`Done`) |
-| **Composition** | `pipe`/`compose`, currying, partial application, effects at the edges |
-| **Arity** | Two data parameters maximum — split the function, don't bundle args into an options object |
-| **Laws** | Functor, Monad, Monoid, Applicative — every new primitive ships with law tests |
+| `just` | `<T>(value: T) => Maybe<T>` |
+| `nothing` | `<T>() => Maybe<T>` |
+| `fmap` | `<A, B>(m: Maybe<A>, f: (a: A) => B) => Maybe<B>` |
+| `mbind` | `<A, B>(m: Maybe<A>, f: (a: A) => Maybe<B>) => Maybe<B>` |
+| `match` | `<T, R>(m, onJust: (v: T) => R, onNothing: () => R) => R` |
+| `orElse` | `<T>(m: Maybe<T>, fallback: T) => T` |
+| `isJust` / `isNothing` | `<T>(m: Maybe<T>) => boolean` |
+| `fromNullable` | `<T>(v: T \| null \| undefined) => Maybe<T>` |
+| `requireJust` | `<T>(m, message) => T` — throws; boundary assertion only |
 
-## The non-negotiables
+### Either
 
-1. **Zero classes** in domain logic — factories returning data plus closures.
-2. **At most two data parameters** — over-arity is fixed by splitting, not bundling.
-3. **No statement `if`/`for`/`while`/`switch`** in the pure core.
-4. **The functional core depends on nothing** — everything may depend on it.
-5. **No lazy wrapper nouns** — `Manager`, `Helper`, `Util(s)`, `Bag`.
-
-## Canon
-
-Guidance is judged against three bodies of work, in this order for the question
-at hand:
-
-| Source | Governs |
+| Function | Signature |
 | --- | --- |
-| **Philip Wadler** | Laws, algebraic structure, types |
-| **Eric Elliott** | Composition, factories, arity |
-| **James Sinclair** | Practical monads, effects, optics |
+| `left` / `right` | `(v) => Either<E, T>` |
+| `efmap` | `<E, A, B>(e, f: (a: A) => B) => Either<E, B>` |
+| `ebind` | `<E, A, B>(e, f: (a: A) => Either<E, B>) => Either<E, B>` |
+| `ematch` | `<E, T, R>(e, onLeft: (e: E) => R, onRight: (t: T) => R) => R` |
+| `isLeft` / `isRight` | `<E, T>(e) => boolean` |
 
-Generic "what is a monad" material and anti-dogma takes are explicitly out of
-scope — if a source stops at explaining what a monad *is*, it is not governing
-how to build one.
+### Composition, collections, routing
+
+| Function | Purpose |
+| --- | --- |
+| `compose` | Right-to-left function composition |
+| `curry` | Fix arity; capture stable inputs |
+| `fold` / `filter` / `traverse` | Collection operations — use these instead of `for` |
+| `createDispatcher` | Key → handler table; returns `Maybe` so a miss is explicit |
+| `multiMatch` | Ordered predicate/handler cases with a wildcard |
+| `_` | Wildcard sentinel for `multiMatch` |
+
+Exported types: `Maybe<T>`, `Either<E, T>`, `Dispatcher`, `Predicate`.
+
+## Branching without `if`
+
+Route by **shape** with `match`, by **key** with `createDispatcher`, by
+**predicate** with `multiMatch`:
+
+```ts
+import { multiMatch, _ } from 'functional-programming-composition'
+
+const tier = multiMatch(order, [
+  [(o: Order) => o.total > 500, () => 'priority'],
+  [_, () => 'standard'],
+])
+```
+
+`createDispatcher` and `multiMatch` both return a `Maybe`, so an unmatched key
+is a value you handle rather than an exception or `undefined`.
+
+## Standalone note
+
+Extracted from the ForbocAI SDK, where it loaded carrier tags and
+match/composition constants from a host `data/fp/runtime.json`. Those values are
+inlined in `src/runtime/runtimeAdapters.ts` so this package stands alone — shape
+and values unchanged, so code written against the data-driven version still
+type-checks here.
+
+## Build
+
+```bash
+npm install
+npm run typecheck   # tsc --noEmit
+npm run build       # tsup -> dist/{index.js, index.cjs, index.d.ts}
+```
+
+Targets ES2020 with `moduleResolution: Bundler` and `strict: true`, matching the
+source SDK's compiler settings.
+
+See [TODO.md](TODO.md) for release follow-ups.
 
 ## License
 
-MIT
+MIT — see [NOTICE.md](../NOTICE.md) for provenance.

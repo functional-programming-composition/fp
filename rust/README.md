@@ -1,107 +1,114 @@
-# fp
+# functional-composition
 
-[![skills.sh](https://skills.sh/b/functional-programming-composition/fp)](https://skills.sh/functional-programming-composition/fp)
+The **Rust** implementation of the [fp core](https://github.com/functional-programming-composition/fp).
+`std`-only — **no external crates**. 92 public functions, 2 macros, three carriers.
 
-A functional programming **working contract** for coding agents — not an
-introduction. It assumes the decision to use FP is settled and governs *how*.
+```toml
+[dependencies]
+functional-composition = "0.1"
+```
 
-Language-independent: the same algebra applies in C, Rust, TypeScript, and
-others. Examples are in TypeScript; only the naming adapts to host convention.
+```rust
+use functional_composition::{just, maybe_map, maybe_match, right, either_match, pipe};
 
-## Install
+let doubled = maybe_map(&just(21), |n| n * 2);
+maybe_match(&doubled, |v| format!("Just({v})"), || "Nothing".to_string()); // "Just(42)"
+```
+
+## Native carriers, shared vocabulary
+
+`Maybe<T>` and `Either<E, T>` alias Rust's own `Option<T>` and `Result<T, E>`,
+so there is **zero conversion cost** at the boundary and everything in `std`
+still works. The named helpers exist so the same vocabulary reads identically
+across the TypeScript, GDScript, and Unreal cores.
+
+```rust
+pub type Maybe<T> = Option<T>;
+```
+
+## API by area
+
+### Maybe / Either
+
+`just`, `nothing`, `is_just`, `is_nothing`, `maybe_map`, `maybe_chain`,
+`maybe_filter`, `maybe_match`, `maybe_or_else`, `from_nullable`, `mbind`,
+`maybe_fmap`, `or_else`, `require_just`, `maybe_from_option`, `maybe_to_option`
+· `left`, `right`, `make_left`, `make_right`, `either_map`, `either_map_left`,
+`either_chain`, `either_match`, `either_or_else`, `ebind`, `either_fmap`,
+`ematch`, `is_left`, `is_right`
+
+### Composition and arity
+
+`pipe`, `compose`, `pipe!`, `compose!` (macros), `curry2`, `curry3`,
+`partial_apply`, `partial_apply2`, `identity`, `constant`, `flip`, `juxt2`,
+`converge2`
+
+The `pipe!` and `compose!` macros avoid the nested-call plumbing that hand-rolled
+composition produces:
+
+```rust
+use functional_composition::pipe;
+let result = pipe!(value, parse, validate, transform);
+```
+
+### Predicate combinators
+
+`both`, `either_pred`, `all_pass`, `any_pass`, `complement`, `equals`
+
+Compose named predicates instead of inlining boolean logic into a branch:
+
+```rust
+let admissible = both(is_alive, is_on_screen);
+```
+
+### Routing
+
+`create_dispatcher`, `create_optional_dispatcher`, `dispatcher_register`,
+`dispatcher_dispatch`, `dispatch`, `match_case`, `multi_match`
+
+`Dispatcher<K, A, R>` is a typed key → handler table; `multi_match` evaluates
+ordered predicate/handler pairs with a wildcard fallthrough. Together they
+replace `match` blocks that route on runtime values.
+
+### Trampoline — iteration without `loop`
+
+`Bounce<T>` (`Bounce::Call` / `Bounce::Done`) plus `trampoline` express
+unbounded iteration as data, keeping it stack-safe without a `while`:
+
+```rust
+use functional_composition::{trampoline, Bounce};
+
+fn sum_to(n: u64, acc: u64) -> Bounce<u64> {
+    match n { 0 => Bounce::Done(acc), _ => Bounce::Call(Box::new(move || sum_to(n - 1, acc + n))) }
+}
+let total = trampoline(sum_to(1_000_000, 0));
+```
+
+Rust does not guarantee tail-call elimination, so this is the portable way to
+run unbounded recursion.
+
+### Effects, laziness, memoization
+
+`tap`, `tap_mut`, `lazy`, `eval`, `memoize`, `memoize_last`
+
+`tap`/`tap_mut` mark an effect inside a pipeline *explicitly* — a declaration
+that something impure happens here, not a loophole.
+
+### Validation, config, async, HTTP
+
+`add_validation`, `validation_pipeline` · `config_builder`, `build_config` ·
+`create_async_result`, `async_execute`, `async_then`, `async_catch` ·
+`http_success`, `http_failure`
+
+## Build
 
 ```bash
-npx skills@latest add functional-programming-composition/fp
+cargo check
+cargo test
 ```
 
-Or use it without installing:
-
-```bash
-npx skills@latest use functional-programming-composition/fp | claude
-```
-
-<details>
-<summary>More install options</summary>
-
-```bash
-# Install globally (available across all projects)
-npx skills@latest add functional-programming-composition/fp -g
-
-# Install for a specific agent, non-interactively
-npx skills@latest add functional-programming-composition/fp -a claude-code -g -y
-
-# List what the repo provides without installing
-npx skills@latest add functional-programming-composition/fp --list
-```
-
-Works with Claude Code, OpenCode, Codex, Cursor, and 70+ other agents via the
-[`skills`](https://github.com/vercel-labs/skills) CLI.
-
-</details>
-
-## The cores
-
-The same algebra, implemented in five languages. Semantics are identical; only
-the naming adapts to host convention. See [NOTICE.md](NOTICE.md) for provenance.
-
-| Language | Directory | Distribution | Notes |
-| --- | --- | --- | --- |
-| **TypeScript** | [`typescript/`](typescript) | [npm: `functional-programming-composition`](https://www.npmjs.com/package/functional-programming-composition) | Standalone, zero dependencies, ESM + CJS + types |
-| **Rust** | [`rust/`](rust) | [crates.io: `functional-composition`](https://crates.io/crates/functional-composition) | std-only, no dependencies |
-| **GDScript** | [`gdscript/`](gdscript) | copy `fp.gd` into your Godot project | Godot 4 |
-| **Unreal C++** | [`ue-cpp/`](ue-cpp) | copy into an Unreal module | Requires `CoreMinimal.h`; uses `TArray`/`TMap` |
-| **JavaScript** | [`javascript/`](javascript) | copy `fp.js` | Plain ES modules, no build step |
-
-```bash
-# TypeScript
-npm install functional-programming-composition
-
-# Rust
-cargo add functional-composition
-```
-
-```ts
-import { just, fmap, match, right, ematch, compose } from 'functional-programming-composition'
-
-match(fmap(just(21), (n) => n * 2), (v) => `Just(${v})`, () => 'Nothing')  // "Just(42)"
-```
-
-## What it covers
-
-| Area | Contents |
-| --- | --- |
-| **Error model** | `Maybe`, `Either`, `Validation` — choosing deliberately, and why collapsing everything into `Nothing` loses information |
-| **The ladder** | Functor → Applicative → Monad → Monoid → Traversable, with a decision tree for picking the *weakest* abstraction that solves the problem |
-| **Applicative vs Monad** | The most-violated distinction: independent checks accumulate (`ap`), dependent steps short-circuit (`chain`) |
-| **Branching** | `match` on shape, dispatch tables on key, predicate combinators on properties — and why a ternary chain is just an `if` that learned to hide |
-| **Loops** | Bounded iteration is a fold; unbounded iteration is a trampoline (`Call`/`Done`) |
-| **Composition** | `pipe`/`compose`, currying, partial application, effects at the edges |
-| **Arity** | Two data parameters maximum — split the function, don't bundle args into an options object |
-| **Laws** | Functor, Monad, Monoid, Applicative — every new primitive ships with law tests |
-
-## The non-negotiables
-
-1. **Zero classes** in domain logic — factories returning data plus closures.
-2. **At most two data parameters** — over-arity is fixed by splitting, not bundling.
-3. **No statement `if`/`for`/`while`/`switch`** in the pure core.
-4. **The functional core depends on nothing** — everything may depend on it.
-5. **No lazy wrapper nouns** — `Manager`, `Helper`, `Util(s)`, `Bag`.
-
-## Canon
-
-Guidance is judged against three bodies of work, in this order for the question
-at hand:
-
-| Source | Governs |
-| --- | --- |
-| **Philip Wadler** | Laws, algebraic structure, types |
-| **Eric Elliott** | Composition, factories, arity |
-| **James Sinclair** | Practical monads, effects, optics |
-
-Generic "what is a monad" material and anti-dogma takes are explicitly out of
-scope — if a source stops at explaining what a monad *is*, it is not governing
-how to build one.
+See [TODO.md](TODO.md) for the crates.io release path.
 
 ## License
 
-MIT
+MIT — see [NOTICE.md](../NOTICE.md) for provenance.
