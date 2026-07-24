@@ -19,25 +19,36 @@ npm publish --access public
       from **Aug 2026**, direct publishing from **Jan 2027**
 - [ ] Add a release workflow so publishing is reproducible rather than local
 
-## Migrate the tests from the source repo
+## ~~Migrate the tests from the source repo~~ — done
 
-**The tests were left behind in the extraction.** They exist in the ForbocAI SDK
-and cover this exact core — port them over rather than writing new ones:
+Migrated from the ForbocAI SDK in 0.1.2. **57 tests across 3 files, all passing.**
 
-| Source (`Forboc.AI/sdk/packages/core/src/__tests__/`) | Lines | Covers |
+| File | Lines | Covers |
 | --- | --- | --- |
-| `fpMaybeEither.test.ts` | 246 | `Maybe` / `Either` construction, `fmap`, `mbind`, `match` |
-| `fpComposition.test.ts` | 217 | `compose`, `curry`, dispatcher, `multiMatch` |
-| `fpNullable.test.ts` | 83 | `fromNullable` / `requireJust` boundary lifts |
+| `src/__tests__/fpMaybeEither.test.ts` | 246 | `Maybe` / `Either` construction, `fmap`, `mbind`, `match` |
+| `src/__tests__/fpComposition.test.ts` | 217 | `compose`, `curry`, dispatcher, `multiMatch` |
+| `src/__tests__/fpNullable.test.ts` | 83 | `fromNullable` / `requireJust` boundary lifts |
 
-- [ ] Copy the three files into `src/__tests__/`
-- [ ] Rewrite their imports — they import from the SDK's internal paths, and
-      here everything comes from `../index`
-- [ ] Add a test runner (vitest) and a `test` script; wire it into
-      `prepublishOnly` so a broken core can't be published
-- [ ] Check for assertions that depend on the old data-driven carrier tags from
-      `data/fp/runtime.json`; those values are inlined now and unchanged, so they
-      should pass as-is, but verify rather than assume
+- [x] Copied the three files into `src/__tests__/`
+- [x] Rewired imports — `../core/fp` → `../index`
+- [x] Brought the fixture data across. The SDK indirected through 3-line adapter
+      modules (`features/testing/fp/*/…Adapters.ts`) that only re-exported JSON
+      from `data/tests/fp/`. That indirection existed for the SDK's data layout,
+      so the tests now import the JSON directly from
+      `src/__tests__/fixtures/{composition,maybe-either,nullable}.json`
+- [x] Added vitest, a `test` script, and wired it into `prepublishOnly` — the
+      suite now gates every publish
+- [x] Confirmed the inlined carrier tags behave identically to the old
+      data-driven `data/fp/runtime.json`. This was the real risk of the
+      standalone conversion, and the migrated suite passing unmodified is the
+      evidence that it held
+- [x] Verified tests and fixtures stay out of the published tarball (still
+      7 files) while remaining inside `tsc --noEmit` coverage
+
+Remaining:
+
+- [ ] Add a `vitest.config.ts` if coverage reporting is wanted
+- [ ] Consider `@vitest/coverage-v8` to find untested branches in the core
 
 ## Before 1.0
 

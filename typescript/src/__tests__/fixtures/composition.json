@@ -1,0 +1,202 @@
+{
+  "suites": {
+    "compose": "compose",
+    "curry": "curry",
+    "collections": "collection composition",
+    "dispatcher": "Dispatcher",
+    "multiMatch": "multiMatch"
+  },
+  "compose": {
+    "binary": {
+      "label": "binary composition applies right to left",
+      "input": 3,
+      "delta": 1,
+      "multiplier": 2,
+      "expected": 7
+    },
+    "ternary": {
+      "label": "ternary composition applies every function",
+      "input": 3,
+      "delta": 1,
+      "multiplier": 2,
+      "expected": "7"
+    },
+    "identity": {
+      "label": "single function composition is identity",
+      "input": 5,
+      "expected": 5
+    }
+  },
+  "curry": {
+    "full": {
+      "label": "full application returns the result",
+      "left": 1,
+      "right": 2,
+      "expected": 3
+    },
+    "partial": {
+      "label": "partial application accepts one argument at a time",
+      "first": 1,
+      "second": 2,
+      "third": 3,
+      "expected": 6
+    },
+    "mixed": {
+      "label": "mixed partial application accepts grouped arguments",
+      "first": 1,
+      "second": 2,
+      "third": 3,
+      "expected": 6
+    },
+    "function": {
+      "label": "partial application returns a function",
+      "bound": 5,
+      "input": 3,
+      "expectedType": "function",
+      "expected": 8
+    }
+  },
+  "collections": {
+    "fold": {
+      "label": "fold accumulates every value",
+      "values": [1, 2, 2, 3],
+      "seed": 0,
+      "expected": 8
+    },
+    "filter": {
+      "label": "filter keeps values matching the predicate",
+      "values": [1, 2, 2, 3],
+      "selectedValue": 2,
+      "expected": [2, 2]
+    },
+    "traverse": {
+      "label": "traverse maps every present result",
+      "values": [2, 4],
+      "multiplier": 2,
+      "fallback": [],
+      "expected": [4, 8]
+    },
+    "traverseFailure": {
+      "label": "traverse fails when any result is missing",
+      "values": [2, 0, 4],
+      "rejectedValue": 0,
+      "expectedNothing": true
+    }
+  },
+  "dispatcher": {
+    "registered": {
+      "label": "registered key returns its result",
+      "entries": [
+        { "key": "a", "value": 1 },
+        { "key": "b", "value": 2 }
+      ],
+      "selectedKey": "a",
+      "fallback": -1,
+      "expected": 1
+    },
+    "missing": {
+      "label": "missing key returns nothing",
+      "entryKey": "a",
+      "entryValue": 1,
+      "missingKey": "z",
+      "fallback": -1,
+      "expected": -1,
+      "expectedNothing": true
+    },
+    "handlers": {
+      "label": "the matching handler fires for each key",
+      "entries": [
+        { "key": "x", "value": "X" },
+        { "key": "y", "value": "Y" },
+        { "key": "z", "value": "Z" }
+      ],
+      "firstKey": "y",
+      "secondKey": "z",
+      "fallback": "",
+      "firstExpected": "Y",
+      "secondExpected": "Z"
+    },
+    "arguments": {
+      "label": "handler receives arguments",
+      "key": "add",
+      "left": 3,
+      "right": 7,
+      "fallback": -1,
+      "expected": 10
+    },
+    "has": {
+      "label": "has checks key existence",
+      "entryKey": "a",
+      "entryValue": 1,
+      "presentKey": "a",
+      "missingKey": "b",
+      "expectedPresent": true,
+      "expectedMissing": false
+    },
+    "keys": {
+      "label": "keys returns every registered key",
+      "entries": [
+        { "key": "a", "value": 1 },
+        { "key": "b", "value": 2 }
+      ],
+      "expected": ["a", "b"]
+    }
+  },
+  "multiMatch": {
+    "first": {
+      "label": "first matching predicate wins",
+      "input": 5,
+      "highThreshold": 10,
+      "middleThreshold": 3,
+      "lowThreshold": 0,
+      "highValue": "big",
+      "middleValue": "medium",
+      "lowValue": "small",
+      "fallback": "none",
+      "expected": "medium"
+    },
+    "none": {
+      "label": "no matching predicate returns nothing",
+      "input": 0,
+      "highThreshold": 10,
+      "lowThreshold": 3,
+      "highValue": "big",
+      "lowValue": "medium",
+      "expectedNothing": true
+    },
+    "wildcard": {
+      "label": "wildcard matches as the default",
+      "input": 0,
+      "threshold": 10,
+      "matchedValue": "big",
+      "defaultValue": "default",
+      "fallback": "none",
+      "expected": "default"
+    },
+    "equality": {
+      "label": "value equality predicates work",
+      "input": "hello",
+      "firstInput": "world",
+      "firstValue": "w",
+      "secondInput": "hello",
+      "secondValue": "h",
+      "fallback": "none",
+      "expected": "h"
+    },
+    "predicateValue": {
+      "label": "function predicates receive the value",
+      "input": 42,
+      "expectedInput": 42,
+      "prefix": "answer is ",
+      "fallback": "",
+      "expected": "answer is 42"
+    },
+    "wildcardValue": {
+      "label": "wildcard handlers receive the value",
+      "input": 99,
+      "prefix": "got ",
+      "fallback": "",
+      "expected": "got 99"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "functional-programming-composition",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A standalone, lawful functional core: Maybe, Either, match, dispatch tables, curry, and composition. Zero dependencies.",
   "keywords": [
     "functional-programming",
@@ -48,11 +48,14 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   },
   "publishConfig": {
     "access": "public"

@@ -1,0 +1,176 @@
+{
+  "suites": {
+    "maybe": "Maybe<T>",
+    "either": "Either<E, T>"
+  },
+  "maybe": {
+    "justMap": {
+      "label": "just map yields the transformed value",
+      "input": 5,
+      "delta": 1,
+      "fallback": 0,
+      "expected": 6,
+      "expectedJust": true
+    },
+    "nothingMap": {
+      "label": "nothing map preserves nothing",
+      "delta": 1,
+      "fallback": 0,
+      "expected": 0,
+      "expectedNothing": true
+    },
+    "chainPass": {
+      "label": "just chain returns just when the predicate passes",
+      "input": 5,
+      "threshold": 3,
+      "fallback": -1,
+      "expected": 5
+    },
+    "chainFail": {
+      "label": "just chain returns nothing when the predicate fails",
+      "input": 2,
+      "threshold": 3,
+      "fallback": -1,
+      "expected": -1
+    },
+    "nothingChain": {
+      "label": "nothing chain propagates nothing",
+      "multiplier": 2,
+      "fallback": -1,
+      "expected": -1
+    },
+    "nothingOrElse": {
+      "label": "nothing getOrElse returns the default",
+      "fallback": 0,
+      "expected": 0
+    },
+    "justOrElse": {
+      "label": "just getOrElse returns the value",
+      "input": 5,
+      "fallback": 0,
+      "expected": 5
+    },
+    "justMatch": {
+      "label": "just match calls the just branch",
+      "input": 5,
+      "multiplier": 2,
+      "nothingValue": -1,
+      "expected": 10
+    },
+    "nothingMatch": {
+      "label": "nothing match calls the nothing branch",
+      "multiplier": 2,
+      "nothingValue": -1,
+      "expected": -1
+    },
+    "fmap": {
+      "label": "fmap transforms a just value",
+      "input": 3,
+      "delta": 10,
+      "fallback": 0,
+      "expected": 13
+    },
+    "mbind": {
+      "label": "mbind chains a just value",
+      "input": 3,
+      "multiplier": 2,
+      "fallback": 0,
+      "expected": 6
+    },
+    "freeMatch": {
+      "label": "match handles both branches",
+      "input": 3,
+      "multiplier": 3,
+      "nothingValue": -1,
+      "expectedJust": 9,
+      "expectedNothing": -1
+    },
+    "freeOrElse": {
+      "label": "orElse handles nothing and just",
+      "fallback": 42,
+      "justValue": 7,
+      "expectedNothing": 42,
+      "expectedJust": 7
+    }
+  },
+  "either": {
+    "rightMap": {
+      "label": "right map yields the transformed value",
+      "input": 5,
+      "delta": 1,
+      "fallback": 0,
+      "expected": 6,
+      "expectedRight": true
+    },
+    "leftMap": {
+      "label": "left map preserves the error",
+      "error": "error",
+      "delta": 1,
+      "fallback": 0,
+      "expected": 0,
+      "expectedLeft": true
+    },
+    "rightChain": {
+      "label": "right chain succeeds",
+      "input": 5,
+      "threshold": 3,
+      "multiplier": 2,
+      "error": "too small",
+      "fallback": 0,
+      "expected": 10
+    },
+    "chainToLeft": {
+      "label": "right chain can produce left",
+      "input": 1,
+      "threshold": 3,
+      "multiplier": 2,
+      "error": "too small",
+      "success": "ok",
+      "expected": "too small"
+    },
+    "leftChain": {
+      "label": "left chain propagates left",
+      "error": "err",
+      "multiplier": 2,
+      "success": "ok",
+      "expected": "err"
+    },
+    "leftMatch": {
+      "label": "left match calls the left branch",
+      "error": "err",
+      "leftPrefix": "Error: ",
+      "rightValue": "OK",
+      "expected": "Error: err"
+    },
+    "rightMatch": {
+      "label": "right match calls the right branch",
+      "input": 42,
+      "leftValue": "Error",
+      "rightPrefix": "Value: ",
+      "expected": "Value: 42"
+    },
+    "efmap": {
+      "label": "efmap transforms a right value",
+      "input": 3,
+      "delta": 10,
+      "fallback": 0,
+      "expected": 13
+    },
+    "ebind": {
+      "label": "ebind chains a right value",
+      "input": 3,
+      "multiplier": 2,
+      "fallback": 0,
+      "expected": 6
+    },
+    "ematch": {
+      "label": "ematch handles left and right branches",
+      "leftError": "e",
+      "rightInput": 5,
+      "leftPrefix": "L:",
+      "rightPrefix": "R:",
+      "expectedLeft": "L:e",
+      "expectedRight": "R:5"
+    }
+  }
+}

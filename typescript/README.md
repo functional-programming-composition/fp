@@ -100,13 +100,19 @@ inlined in `src/runtime/runtimeAdapters.ts` so this package stands alone — sha
 and values unchanged, so code written against the data-driven version still
 type-checks here.
 
-## Build
+## Build and test
 
 ```bash
 npm install
-npm run typecheck   # tsc --noEmit
+npm test            # vitest -- 57 tests across 3 files
+npm run typecheck   # tsc --noEmit (covers the tests too)
 npm run build       # tsup -> dist/{index.js, index.cjs, index.d.ts}
 ```
+
+The suite came across from the ForbocAI SDK and covers `Maybe`/`Either`
+construction and chaining, composition, currying, the dispatcher, `multiMatch`,
+and the `fromNullable`/`requireJust` boundary lifts. It runs as a
+`prepublishOnly` gate, so a failing core cannot be published.
 
 Targets ES2020 with `moduleResolution: Bundler` and `strict: true`, matching the
 source SDK's compiler settings.

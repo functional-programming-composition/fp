@@ -1,0 +1,70 @@
+{
+  "suites": {
+    "fromNullable": "fromNullable",
+    "requireJust": "requireJust"
+  },
+  "fromNullable": {
+    "nonNull": {
+      "label": "non-null value becomes just",
+      "input": 42,
+      "fallback": 0,
+      "expected": 42,
+      "expectedJust": true
+    },
+    "nullValue": {
+      "label": "null becomes nothing",
+      "expectedNothing": true
+    },
+    "undefinedValue": {
+      "label": "undefined becomes nothing",
+      "expectedNothing": true
+    },
+    "emptyString": {
+      "label": "empty string is just (not nothing)",
+      "input": "",
+      "fallback": "fallback",
+      "expected": "",
+      "expectedJust": true
+    },
+    "zero": {
+      "label": "zero is just (not nothing)",
+      "input": 0,
+      "fallback": 99,
+      "expected": 0,
+      "expectedJust": true
+    },
+    "falseValue": {
+      "label": "false is just (not nothing)",
+      "input": false,
+      "expectedJust": true
+    },
+    "chain": {
+      "label": "chains with map/chain",
+      "input": "hello",
+      "fallback": "",
+      "expected": "HELLO"
+    }
+  },
+  "requireJust": {
+    "justValue": {
+      "label": "extracts value from just",
+      "input": 42,
+      "error": "fail",
+      "expected": 42
+    },
+    "nothingValue": {
+      "label": "throws on nothing",
+      "error": "expected failure"
+    },
+    "nonNull": {
+      "label": "works with fromNullable for non-null",
+      "input": "hello",
+      "error": "fail",
+      "expected": "hello"
+    },
+    "nullValue": {
+      "label": "throws with fromNullable for null",
+      "error": "was null"
+    }
+  }
+}
