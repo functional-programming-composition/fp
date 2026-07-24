@@ -19,11 +19,31 @@ npm publish --access public
       from **Aug 2026**, direct publishing from **Jan 2027**
 - [ ] Add a release workflow so publishing is reproducible rather than local
 
+## Migrate the tests from the source repo
+
+**The tests were left behind in the extraction.** They exist in the ForbocAI SDK
+and cover this exact core — port them over rather than writing new ones:
+
+| Source (`Forboc.AI/sdk/packages/core/src/__tests__/`) | Lines | Covers |
+| --- | --- | --- |
+| `fpMaybeEither.test.ts` | 246 | `Maybe` / `Either` construction, `fmap`, `mbind`, `match` |
+| `fpComposition.test.ts` | 217 | `compose`, `curry`, dispatcher, `multiMatch` |
+| `fpNullable.test.ts` | 83 | `fromNullable` / `requireJust` boundary lifts |
+
+- [ ] Copy the three files into `src/__tests__/`
+- [ ] Rewrite their imports — they import from the SDK's internal paths, and
+      here everything comes from `../index`
+- [ ] Add a test runner (vitest) and a `test` script; wire it into
+      `prepublishOnly` so a broken core can't be published
+- [ ] Check for assertions that depend on the old data-driven carrier tags from
+      `data/fp/runtime.json`; those values are inlined now and unchanged, so they
+      should pass as-is, but verify rather than assume
+
 ## Before 1.0
 
-- [ ] **Add tests.** The package currently ships with none. Priority is law
-      tests (Functor identity/composition, Monad left/right identity and
-      associativity) since those are what make the abstraction worth having
+- [ ] Add **law tests** on top of the migrated suite — Functor identity and
+      composition, Monad left/right identity and associativity. The source tests
+      cover behavior; the laws are what make the abstraction worth having
 - [ ] Add `Validation<E, T>` — accumulating `ap`, deliberately **no** `chain`.
       This is the biggest gap: independent validation currently has to misuse
       `Either`, which reports one error and discards the rest. The Unreal core

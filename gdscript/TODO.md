@@ -56,6 +56,26 @@ Uses an npm-style `godot.package` manifest and can resolve from npm or git.
       `godot.package` manifest
 - [ ] Document the install line for gpm users
 
+## Migrate the tests from the source repo
+
+**The tests were left behind in the extraction.** therapy-one has a dedicated
+suite for this exact file:
+
+| Source | Lines |
+| --- | --- |
+| `Forboc.AI/therapy-one/tests/unit/test_fp.gd` | 196 |
+
+- [ ] Copy it into `gdscript/tests/test_fp.gd`
+- [ ] Rewrite the `preload` path — it points at therapy-one's `res://src/fp.gd`
+- [ ] Note the runner: therapy-one's suite sits under `tests/unit/`, which
+      implies GUT or a similar Godot test framework. Document which one is
+      required, or port the assertions to whatever runner this repo adopts
+- [ ] Add law tests (Functor identity/composition, Monad identities) — the
+      source suite covers behavior, not laws
+- [ ] Include a regression test for the `multi_match` evaluation contract: this
+      implementation filters before selecting, so **every predicate runs**. That
+      difference from the short-circuiting ports deserves a test that pins it
+
 ## Before any submission
 
 - [ ] Add a `plugin.cfg` if going the addon route

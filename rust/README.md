@@ -100,12 +100,21 @@ that something impure happens here, not a loophole.
 `create_async_result`, `async_execute`, `async_then`, `async_catch` ·
 `http_success`, `http_failure`
 
-## Build
+## Build and test
 
 ```bash
 cargo check
-cargo test
+cargo test    # 35 passing
 ```
+
+This is the only core in the repository that arrived **with its tests** — they
+were inline in the source `functional.rs` as a `#[cfg(test)] mod tests`, so they
+came across with the extraction and cover the carriers, composition, predicate
+combinators, the trampoline, and the validation pipeline. The other languages'
+suites still need migrating; see each directory's `TODO.md`.
+
+Doc-tests are currently empty, so the examples above and in `TODO.md` are
+unverified — that is the next gap to close.
 
 See [TODO.md](TODO.md) for the crates.io release path.
 

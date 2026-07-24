@@ -1,6 +1,6 @@
 {
   "name": "functional-programming-composition",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A standalone, lawful functional core: Maybe, Either, match, dispatch tables, curry, and composition. Zero dependencies.",
   "keywords": [
     "functional-programming",

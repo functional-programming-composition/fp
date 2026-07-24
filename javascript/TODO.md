@@ -45,5 +45,16 @@ This is the smallest core at 232 lines. Missing relative to Rust/GDScript/UE:
 
 ## Tests
 
-- [ ] There are none. Add law tests at minimum — the method-style carriers make
-      it easy to accidentally break the monad laws when editing
+Unlike the other four cores, there is **nothing to migrate** — I searched
+Lanternbough and frontier-of-jefferson and found no test files covering `fp.js`.
+This core has never had tests in any repo.
+
+- [ ] Write them from scratch. Start with law tests (Functor identity and
+      composition, Monad left/right identity and associativity) — the
+      method-style carriers make it easy to break the laws while editing, since
+      `.map`/`.chain` are reimplemented per constructor rather than shared
+- [ ] The [TypeScript suite](../typescript/TODO.md) is the closest reference:
+      once those tests are migrated from the SDK, most assertions port directly
+      because the two cores expose the same 22-symbol surface
+- [ ] If this core is retired rather than ported (see the decision above), skip
+      this section entirely

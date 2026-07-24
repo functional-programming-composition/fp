@@ -61,6 +61,32 @@ Once the port compiles standalone:
       ```
 - [ ] This is the **cheapest** path to a consumable C++ package; do it first
 
+## Migrate the tests from the source repo
+
+**The tests were left behind in the extraction.** The Unreal SDK has a test tree
+mirroring the `FP/` module layout:
+
+| Source (`Forboc.AI/sdk-ue-5/Source/ForbocAI_SDK/Private/Tests/Core/FP/`) |
+| --- |
+| `Array/array_test.cpp` |
+| `Composition/composition_test.cpp` |
+| `Dispatcher/dispatcher_test.cpp` |
+| `Match/match_test.cpp` |
+
+- [ ] Copy the four files into `ue-cpp/Tests/` preserving the module layout
+- [ ] Rewrite the includes — they resolve against the SDK module's
+      `Private/Tests/...` root
+- [ ] Note these are **Unreal Automation Tests**, so they need a UE module and
+      the automation runner to execute; they cannot run in a bare C++ harness
+- [ ] Coverage gap: only 4 of 24 modules have tests. `Maybe`, `Either`,
+      `Validation`, `Trampoline`, `Memoization`, `Lazy`, `Curry`, `Monad`, and
+      `Functor` are all untested — write those, prioritizing `Validation` and
+      `Trampoline`
+- [ ] `FP/Test/Test.hpp` is a **test helper**, not a suite. Do not mistake its
+      presence for coverage
+- [ ] If the Track B engine-independent port happens, the tests need a
+      non-Unreal runner (Catch2 / doctest) alongside the automation ones
+
 ## Correctness follow-ups
 
 - [ ] Fix the trampoline: the source helper re-enters **recursively**, which is
